@@ -1,0 +1,37 @@
+# Screen configurations for a 2 or 3-screen pinball setup
+screens:
+  # Primary display for the playfield (main game area)
+  Playfield:
+    id: 1
+    size_x: 3840
+    size_y: 2160
+
+  # Display for the Dot Matrix Display (DMD/Score display)
+  # Set size_x: 0 for 2-screen setup
+  DMD:
+    id: 2
+    size_x: 1920    # Set to 0 for 2-screen setup
+    size_y: 1080
+
+  # Display for the backglass artwork and animations
+  BackGlass:
+    id: 3
+    size_x: 2560
+    size_y: 1440
+
+# Parameters used for detecting uniform rectangles in images
+defaults:
+  # Rectangle aspect ratio limits (width/height)
+  min_aspect_ratio: 0.1    # Rectangles won't be taller than 10x their width
+  max_aspect_ratio: 10.0   # Rectangles won't be wider than 10x their height
+  
+  # Rectangle size relative to total image area
+  min_area_ratio: 0.00001  # Minimum 0.001% of total image area
+  max_area_ratio: 0.75     # Maximum 75% of total image area
+
+  # Minimum dimensions in pixels
+  min_width: 10    # Rectangles must be at least 10 pixels wide
+  min_height: 5    # Rectangles must be at least 5 pixels tall
+  
+  # Gradient threshold for detecting uniform areas
+  gradient_threshold: 1.0  # Maximum allowed color variation gradient

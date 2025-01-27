@@ -1,0 +1,39 @@
+[project]
+name = "dmd-config"
+version = "0.1.0"
+description = "A DMD configuration tool from DirectB2S files in Visual Pinball ini"
+authors = [
+    {name = "Le-Syl21",email = "sylvain.gargasson@gmail.com"}
+]
+license = {text = "GPLv3"}
+readme = "README.md"
+homepage = "https://github.com/yourusername/dmd-config"
+repository = "https://github.com/yourusername/dmd-config"
+keywords = ["vpinball", "dmd", "directb2s", "pinball", "vpinballx", "pincab"]
+requires-python = ">=3.12"
+dependencies = [
+    "pillow (>=11.1.0,<12.0.0)",
+    "numpy (>=2.2.2,<3.0.0)",
+    "opencv-python (>=4.11.0.86,<5.0.0.0)",
+    "pyyaml (>=6.0.2,<7.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+dmd-config = "dmd_config:main"
+
+[project]
+repository = "https://github.com/Le-Syl21/dmd-config"
+
+[project]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: End Users/Desktop",
+    "Topic :: Games/Entertainment",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)"
+]
