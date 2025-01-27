@@ -32,13 +32,38 @@ def save_base64_image(image_data, output_path):
     except Exception as e:
         print(f"Error saving image {output_path}: {str(e)}")
 
+def calculate_screen_positions(screens):
+    """
+    Calculate screen positions based on their IDs.
+    Windows joins screens in ID order, so we need to sum up widths
+    of all screens that come before in ID sequence.
+    """
+    # Sort screens by ID
+    sorted_screens = sorted(screens.items(), key=lambda x: x[1]['id'])
+    
+    # Calculate x position for each screen based on previous screens
+    positions = {}
+    current_x = 0
+    
+    for screen_name, screen_data in sorted_screens:
+        positions[screen_name] = {
+            'x': current_x,
+            'width': screen_data['size_x']
+        }
+        current_x += screen_data['size_x']
+    
+    return positions
+
 def generate_ini_config(backglass_rect, dmd_rect, config_data, output_path):
     """
     Generate the ini configuration file based on detected rectangles and screen config.
-    Scale detected rectangles to match actual screen dimensions.
+    Screen positions are based on Windows screen IDs.
     """
     screens = config_data['screens']
     is_three_screens = screens['DMD']['size_x'] > 0
+    
+    # Calculate screen positions based on IDs
+    screen_positions = calculate_screen_positions(screens)
     
     ini_content = "[Standalone]\n"
     
@@ -59,10 +84,10 @@ def generate_ini_config(backglass_rect, dmd_rect, config_data, output_path):
         scaled_height = int(dmd_rect['height'] * scale_y)
         
         # 3-screen mode: use scaled DMDImage rectangle
-        dmd_x = screens['Playfield']['size_x'] + scaled_x
-        dmd_y = scaled_y
-        dmd_width = scaled_width
-        dmd_height = scaled_height
+        pinmame_x = screen_positions['DMD']['x'] + scaled_x
+        pinmame_y = scaled_y
+        pinmame_width = scaled_width
+        pinmame_height = scaled_height
     elif backglass_rect:
         # Similar scaling for BackglassImage in 2-screen mode
         scale_x = screens['BackGlass']['size_x'] / backglass_rect['img_width']
@@ -73,24 +98,24 @@ def generate_ini_config(backglass_rect, dmd_rect, config_data, output_path):
         scaled_width = int(backglass_rect['width'] * scale_x)
         scaled_height = int(backglass_rect['height'] * scale_y)
         
-        dmd_x = screens['Playfield']['size_x'] + scaled_x
-        dmd_y = scaled_y
-        dmd_width = scaled_width
-        dmd_height = scaled_height
+        pinmame_x = screen_positions['BackGlass']['x'] + scaled_x
+        pinmame_y = scaled_y
+        pinmame_width = scaled_width
+        pinmame_height = scaled_height
     
     # Set PinMAME window position and size
-    ini_content += f"PinMAMEWindowX = {dmd_x}\n"
-    ini_content += f"PinMAMEWindowY = {dmd_y}\n"
-    ini_content += f"PinMAMEWindowWidth = {dmd_width}\n"
-    ini_content += f"PinMAMEWindowHeight = {dmd_height}\n"
+    ini_content += f"PinMAMEWindowX = {pinmame_x}\n"
+    ini_content += f"PinMAMEWindowY = {pinmame_y}\n"
+    ini_content += f"PinMAMEWindowWidth = {pinmame_width}\n"
+    ini_content += f"PinMAMEWindowHeight = {pinmame_height}\n"
     ini_content += "PinMAMEWindowRotation =\n"
     
     # FlexDMD Settings (same as PinMAME)
     ini_content += "FlexDMDWindow = 1\n"
-    ini_content += f"FlexDMDWindowX = {dmd_x}\n"
-    ini_content += f"FlexDMDWindowY = {dmd_y}\n"
-    ini_content += f"FlexDMDWindowWidth = {dmd_width}\n"
-    ini_content += f"FlexDMDWindowHeight = {dmd_height}\n"
+    ini_content += f"FlexDMDWindowX = {pinmame_x}\n"
+    ini_content += f"FlexDMDWindowY = {pinmame_y}\n"
+    ini_content += f"FlexDMDWindowWidth = {pinmame_width}\n"
+    ini_content += f"FlexDMDWindowHeight = {pinmame_height}\n"
     
     # B2S Settings
     ini_content += "B2SHideGrill =\n"
@@ -100,15 +125,15 @@ def generate_ini_config(backglass_rect, dmd_rect, config_data, output_path):
     ini_content += "B2SDualMode =\n"
     ini_content += "B2SWindows = 1\n"
     
-    # Backglass position
-    ini_content += f"B2SBackglassX = {screens['Playfield']['size_x'] + screens['DMD']['size_x']}\n"
+    # Backglass position based on ID
+    ini_content += f"B2SBackglassX = {screen_positions['BackGlass']['x']}\n"
     ini_content += "B2SBackglassY = 0\n"
     ini_content += f"B2SBackglassWidth = {screens['BackGlass']['size_x']}\n"
     ini_content += f"B2SBackglassHeight = {screens['BackGlass']['size_y']}\n"
     ini_content += "B2SBackglassRotation =\n"
     
-    # B2S DMD settings
-    ini_content += f"B2SDMDX = {screens['Playfield']['size_x']}\n"
+    # B2S DMD settings based on ID
+    ini_content += f"B2SDMDX = {screen_positions['DMD']['x']}\n"
     ini_content += "B2SDMDY = 0\n"
     ini_content += f"B2SDMDWidth = {screens['DMD']['size_x']}\n"
     ini_content += f"B2SDMDHeight = {screens['DMD']['size_y']}\n"
@@ -273,7 +298,7 @@ def main():
     parser = argparse.ArgumentParser(description='DMD Configuration Generator')
     parser.add_argument('files', nargs='+', help='DirectB2S files to process')
     parser.add_argument('-s', '--save', action='store_true', help='Save all images found in DirectB2S')
-    parser.add_argument('-c', '--config', default='DMD_config.yaml', help='Path to screen configuration YAML file')
+    parser.add_argument('-c', '--config', default='dmd_config.yaml', help='Path to screen configuration YAML file')
     args = parser.parse_args()
     
     # Load screen configuration
