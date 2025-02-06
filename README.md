@@ -1,87 +1,111 @@
-# DMD Config Tool
+# DMD Config
 
-A command-line tool to automatically configure DMD (Dot Matrix Display) and Backglass settings for Visual Pinball tables using DirectB2S files.
+A tool to analyze DirectB2S FullDMD files and automatically generate DMD (Dot Matrix Display) placement configurations for your virtual pinball cabinet.
 
 ## Features
 
-- Automatic DMD area detection in DirectB2S files
-- Support for both 2 and 3 screen setups
-- Precise template-based rectangle detection
-- Configurable screen layouts via YAML file
-- Optional image extraction for debugging
+- Automatic DMD placement analysis for DirectB2S files
+- Support for multiple table processing
+- Visual display of DMD placement results
+- Image extraction from DirectB2S files
+- Configurable settings via YAML
 
 ## Installation
 
+1. Clone the repository:
 ```bash
-pip install dmd-config
+git clone https://github.com/Le-Syl21/dmd-config.git
+cd dmd-config
 ```
 
-## Usage
-
-Basic usage:
+2. Create and activate a Python virtual environment:
 ```bash
-dmd-config your_table.directb2s
+python3 -m venv --upgrade-deps venv
+source venv/bin/activate
 ```
 
-Save extracted images for debugging:
+3. Install dependencies:
 ```bash
-dmd-config -s your_table.directb2s
-```
-
-Use custom screen configuration:
-```bash
-dmd-config -c custom_config.yaml your_table.directb2s
+pip install --require-virtualenv --requirement requirements.pip
 ```
 
 ## Configuration
 
-Create a `DMD_config.yaml` file to define your screen layout:
+- Modify `DMD_config.yaml` to match your PinCab setup
+- Adjust DMD discovery filter settings if needed for some specific tables (DMD_config.yaml as comments)
 
-```yaml
-screens:
-  # Primary display for the playfield
-  Playfield:
-    id: 1
-    size_x: 3840
-    size_y: 2160
+## Usage
 
-  # Display for the DMD (set size_x: 0 for 2-screen setup)
-  DMD:
-    id: 2
-    size_x: 1920
-    size_y: 1080
-
-  # Display for the backglass
-  BackGlass:
-    id: 3
-    size_x: 2560
-    size_y: 1440
+First, activate the virtual environment:
+```bash
+source venv/bin/activate
 ```
 
-## Output
+### Basic Commands
 
-The tool generates an INI file with the same name as your DirectB2S file, containing all necessary settings for:
-- PinMAME DMD window
-- FlexDMD window
-- B2S window settings
-- Screen positions and dimensions
+View available options:
+```bash
+./DMD_config.py --help
+```
 
-## Requirements
+Process a single table:
+```bash
+./DMD_config.py path/to/table/table.directb2s
+```
 
-- Python 3.8 or higher
-- OpenCV
-- NumPy
-- Pillow
-- PyYAML
+Process multiple tables:
+```bash
+./DMD_config.py path/to/tables/*/*.directb2s
+```
 
-## License
+When finished, deactivate the virtual environment:
+```bash
+deactivate
+```
 
-This project is licensed under the GNU General Public License v3 (GPLv3).
+### Command Line Options
 
-## Contributing
+```
+usage: DMD_config.py [-h] [-d] [-s] [-c CONFIG] files [files ...]
 
-Found a bug or want to contribute? Feel free to open an issue or submit a pull request on GitHub.
+DMD Configuration Generator
+
+positional arguments:
+  files                 DirectB2S files to process
+
+options:
+  -h, --help                     show this help message and exit
+  -d, --display                  Display result of DMD placement
+  -s, --save                     Save all images found in DirectB2S
+  -c CONFIG, --config CONFIG     Path to screen configuration YAML file
+```
+
+## Example Results
+
+### Display Mode (`--display`)
+
+#### DeadPool
+![DeadPool FullDMD Display](images/DeadPool_FullDMD_display.png)
+![DeadPool BackGlass Display](images/DeadPool_BackGlass_display.png)
+
+#### TMNT
+![TMNT FullDMD Display](images/TMNT_FullDMD_display.png)
+
+### Save Mode (`--save`)
+
+#### DeadPool
+![DeadPool FullDMD](images/DeadPool_FullDMD_save.png)
+![DeadPool Bulb](images/DeadPool_Bulb_save.png)
+![DeadPool BackGlass](images/DeadPool_BackGlass_save.png)
+
+#### TMNT
+![TMNT FullDMD](images/TMNT_FullDMD_save.png)
+![TMNT BackGlass](images/TMNT_BackGlass_save.png)
 
 ## Author
 
-Le-Syl21 (sylvain.gargasson@gmail.com)
+- [@Le-Syl21](https://github.com/Le-Syl21)
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.

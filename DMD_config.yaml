@@ -1,0 +1,43 @@
+# Screen configurations for a 2 or 3-screen pinball setup
+screens:
+  # Primary display for the playfield (main game area)
+  Playfield:
+    id: 1
+    size_x: 3840    # Width of the playfield screen in pixels
+    size_y: 2160    # Height of the playfield screen in pixels
+
+  # Display for the Dot Matrix Display (DMD/Score display)
+  DMD:
+    id: 2
+    size_x: 1920    # Width of DMD screen (set to 0 for 2-screen setup)
+    size_y: 1080    # Height of DMD screen
+    # Default DMD window position and size for 3-screen setup
+    default_x: 100      # X offset from left edge of DMD screen
+    default_y: 50       # Y offset from top edge of DMD screen
+    default_width: 800  # Width of DMD window
+    default_height: 300 # Height of DMD window
+
+  # Display for the backglass artwork and animations
+  BackGlass:
+    id: 3
+    size_x: 2560    # Width of backglass screen in pixels
+    size_y: 1440    # Height of backglass screen in pixels
+    # Default DMD window position and size when using 2-screen setup
+    dmd_default_x: 200      # X offset from left edge of backglass
+    dmd_default_y: 800      # Y offset from top edge of backglass
+    dmd_default_width: 800  # Width of DMD window
+    dmd_default_height: 300 # Height of DMD window
+
+# Parameters for DMD rectangle detection in images
+defaults:
+  # Rectangle aspect ratio constraints (width/height)
+  min_aspect_ratio: 0.1    # Minimum aspect ratio (height can be up to 10x width)
+  max_aspect_ratio: 10.0   # Maximum aspect ratio (width can be up to 10x height)
+  
+  # Rectangle size constraints relative to total image area
+  min_area_ratio: 0.05     # Rectangle must occupy at least 5% of image
+  max_area_ratio: 0.75     # Rectangle cannot exceed 75% of image area
+
+  # Minimum dimension requirements in pixels
+  min_width: 200           # Minimum width of detected rectangle
+  min_height: 200          # Minimum height of detected rectangle
