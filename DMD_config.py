@@ -220,11 +220,6 @@ def generate_ini_config(backglass_rect, dmd_rect, config_data, output_path):
     screens = config_data["screens"]
     is_three_screens = screens["DMD"]["size_x"] > 0
 
-    # Initialize INI content with standard settings
-    ini_content = "[Standalone]\n"
-    ini_content += "PinMAMEPath =\n"
-    ini_content += "PinMAMEWindow = 1\n"
-
     # Calculate DMD window position and size based on available data
     if is_three_screens and dmd_rect:
         # Use detected DMD position from DMD image in 3-screen setup
@@ -278,48 +273,58 @@ def generate_ini_config(backglass_rect, dmd_rect, config_data, output_path):
         dmd_width = screens["BackGlass"]["dmd_default_width"]
         dmd_height = screens["BackGlass"]["dmd_default_height"]
 
-    # Configure PinMAME window settings
-    ini_content += f"PinMAMEWindowX = {dmd_x}\n"
-    ini_content += f"PinMAMEWindowY = {dmd_y}\n"
-    ini_content += f"PinMAMEWindowWidth = {dmd_width}\n"
-    ini_content += f"PinMAMEWindowHeight = {dmd_height}\n"
-    ini_content += "PinMAMEWindowRotation =\n"
+    # Create new configuration
+    new_config = {
+        "PinMAMEWindow": "1",
+        "PinMAMEWindowX": str(dmd_x),
+        "PinMAMEWindowY": str(dmd_y),
+        "PinMAMEWindowWidth": str(dmd_width),
+        "PinMAMEWindowHeight": str(dmd_height),
+        "FlexDMDWindow": "1",
+        "FlexDMDWindowX": str(dmd_x),
+        "FlexDMDWindowY": str(dmd_y),
+        "FlexDMDWindowWidth": str(dmd_width),
+        "FlexDMDWindowHeight": str(dmd_height),
+        "B2SWindows": "1",
+        "B2SBackglassX": str(screens['Playfield']['size_x'] + screens['DMD']['size_x']),
+        "B2SBackglassY": "0",
+        "B2SBackglassWidth": str(screens['BackGlass']['size_x']),
+        "B2SBackglassHeight": str(screens['BackGlass']['size_y']),
+        "B2SDMDX": str(screens['Playfield']['size_x']),
+        "B2SDMDY": "0",
+        "B2SDMDWidth": str(screens['DMD']['size_x']),
+        "B2SDMDHeight": str(screens['DMD']['size_y'])
+    }
 
-    # Configure FlexDMD window settings
-    ini_content += "FlexDMDWindow = 1\n"
-    ini_content += f"FlexDMDWindowX = {dmd_x}\n"
-    ini_content += f"FlexDMDWindowY = {dmd_y}\n"
-    ini_content += f"FlexDMDWindowWidth = {dmd_width}\n"
-    ini_content += f"FlexDMDWindowHeight = {dmd_height}\n"
+    # Check if file exists and read existing configuration
+    existing_config = {}
+    if os.path.exists(output_path):
+        try:
+            with open(output_path, "r") as f:
+                for line in f:
+                    line = line.strip()
+                    if line and not line.startswith("[") and "=" in line:
+                        key, value = line.split("=", 1)
+                        existing_config[key.strip()] = value.strip()
+            print(f"Existing configuration found in {os.path.basename(output_path)}")
+        except Exception as e:
+            print(f"Error reading existing configuration: {str(e)}")
 
-    # Configure B2S window settings
-    ini_content += "B2SHideGrill =\n"
-    ini_content += "B2SHideB2SDMD =\n"
-    ini_content += "B2SHideB2SBackglass =\n"
-    ini_content += "B2SHideDMD =\n"
-    ini_content += "B2SDualMode =\n"
-    ini_content += "B2SWindows = 1\n"
+    # Merge configurations, giving priority to new values
+    merged_config = {**existing_config, **new_config}
 
-    # Configure B2S backglass window
-    ini_content += f"B2SBackglassX = {screens['Playfield']['size_x'] + screens['DMD']['size_x']}\n"
-    ini_content += "B2SBackglassY = 0\n"
-    ini_content += f"B2SBackglassWidth = {screens['BackGlass']['size_x']}\n"
-    ini_content += f"B2SBackglassHeight = {screens['BackGlass']['size_y']}\n"
-    ini_content += "B2SBackglassRotation =\n"
-
-    # Configure B2S DMD window
-    ini_content += f"B2SDMDX = {screens['Playfield']['size_x']}\n"
-    ini_content += "B2SDMDY = 0\n"
-    ini_content += f"B2SDMDWidth = {screens['DMD']['size_x']}\n"
-    ini_content += f"B2SDMDHeight = {screens['DMD']['size_y']}\n"
-    ini_content += "B2SDMDRotation =\n"
-    ini_content += "B2SDMDFlipY =\n"
-    ini_content += "B2SPlugins =\n"
-
-    # Save configuration to file
+    # Write merged configuration to file
     with open(output_path, "w") as f:
-        f.write(ini_content)
-    print(f"Configuration saved to {os.path.basename(output_path)}")
+        f.write("[Standalone]\n")
+        # Write PinMAMEPath first if it exists
+        if "PinMAMEPath" in merged_config:
+            f.write(f"PinMAMEPath = {merged_config.pop('PinMAMEPath')}\n")
+        
+        # Write all other configurations
+        for key, value in merged_config.items():
+            f.write(f"{key} = {value}\n")
+            
+    print(f"Configuration updated and saved to {os.path.basename(output_path)}")
 
 
 def main():
