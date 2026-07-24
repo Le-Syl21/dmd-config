@@ -332,7 +332,10 @@ def main():
     Main entry point for the DMD Configuration Generator
     """
     # Parse command line arguments
-    parser = argparse.ArgumentParser(description="DMD Configuration Generator")
+    parser = argparse.ArgumentParser(
+        description="DMD Configuration Generator",
+        epilog="Community & support: https://discord.gg/T37DYHmt2j",
+    )
     parser.add_argument("files", nargs="+", help="DirectB2S files to process")
     parser.add_argument("-d", "--display", action="store_true", help="Display result of DMD placement")
     parser.add_argument("-s", "--save", action="store_true", help="Save all images found in DirectB2S")

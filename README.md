@@ -2,6 +2,12 @@
 
 A tool to analyze DirectB2S FullDMD files and automatically generate DMD (Dot Matrix Display) placement configurations for your virtual pinball cabinet.
 
+## Community & support
+
+Questions, bug reports, beta testing, or just want to chat? Join the Discord:
+
+[![Discord](https://img.shields.io/badge/Discord-Le--Syl21%20Tools-5865F2?logo=discord&logoColor=white)](https://discord.gg/T37DYHmt2j)
+
 ## Features
 
 - Automatic DMD placement analysis for DirectB2S files
